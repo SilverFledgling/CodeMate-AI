@@ -1,11 +1,15 @@
 
 # Bỏ qua virtual enviroment
+<<<<<<< HEAD
 venv/
-env/
-
+node_modules/
+>>>>>>> <commit-hash>
 # Bỏ qua thư mục uploads
+
 uploads/
 backend/uploads/
+=======
+doof-ferb___vlsp2020_vinai_100h/
 
 #Bỏ qua file log
 *.log
