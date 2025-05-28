@@ -1,0 +1,14 @@
+flask==2.3.2
+git+https://github.com/openai/whisper.git
+transformers==4.35.0
+datasets==2.14.5
+torch==2.1.0
+torchaudio==2.1.0
+torchvision==0.16.0
+mysql-connector-python==8.0.33
+soundfile==0.12.1
+numpy==1.23.5
+pyarrow==12.0.1
+librosa==0.10.1
+ffmpeg-python
+types-requests
