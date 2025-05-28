@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhận diện giọng nói</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Nhận diện giọng nói và phản hồi</h1>
+        <div class="input-section">
+            <input type="file" id="audioInput" accept="audio/*">
+            <button onclick="processAudio()">Xử lý</button>
+        </div>
+        <div class="result-section">
+            <h3>Kết quả:</h3>
+            <p id="transcript"></p>
+            <p id="response"></p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

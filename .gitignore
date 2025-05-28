@@ -1,0 +1,38 @@
+
+# Bỏ qua virtual enviroment
+venv/
+env/
+
+# Bỏ qua thư mục uploads
+doof-ferb___vlsp2020_vinai_100h/
+
+#Bỏ qua file log
+*.log
+
+# Bỏ qua cache Python
+__pycache__/
+*.pyc
+*.pycache
+
+# Bỏ qua build artifacts
+*.egg-info
+dist/
+build/
+
+#Bỏ qua model checkpoints
+whisper_finetuned/
+checkpoints/
+
+# Bỏ qua temporary files
+tmp*/
+*.tmp
+
+# Bỏ qua file dữ liệu lớn
+*.arrow
+*.wav
+*.mp3
+*.flac
+
+#Bỏ qua file hệ thống
+.DS_Store
+Thumbs.db
