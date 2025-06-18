@@ -1,219 +1,147 @@
 import os
 import logging
-from flask import Flask, request, jsonify
-import whisper
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments
-from datasets import load_dataset, load_from_disk, DownloadConfig
+from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
+from transformers import WhisperForConditionalGeneration, WhisperProcessor, AutoTokenizer, AutoModelForSequenceClassification
 import torch
-import torch.quantization
+import librosa
+from datetime import datetime
 import mysql.connector
 from mysql.connector import Error
-import soundfile as sf
-import numpy as np
-from datetime import datetime
 
-# Thiết lập logging
-logging.basicConfig(
-    filename='D:\\TTCS\\backend\\app.log',
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+# --- CÀI ĐẶT CƠ BẢN ---
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+app = Flask(__name__,
+            template_folder='../frontend',
+            static_folder='../frontend',
+            static_url_path='')
+CORS(app)
 
-app = Flask(__name__)
-
-# Kết nối MySQL
+# --- CẤU HÌNH DATABASE ---
 db_config = {
     "host": "localhost",
     "user": "root",
-    "password": "2003",
-    "database": "speech_recognition_new"
+    "password": "",
+    "database": "speech_recognition" # Sửa tên database lại cho đúng với file .sql
 }
 
-# Tải dữ liệu từ Hugging Face
-dataset_path = r"D:\TTCS\backend\uploads"
-dataset_cache = os.path.join(dataset_path, "doof-ferb___vlsp2020_vinai_100h")
+# --- TẢI MODEL (CHỈ TẢI MỘT LẦN KHI SERVER KHỞI ĐỘNG) ---
+logging.info("Bắt đầu tải các mô hình...")
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+logging.info(f"Sử dụng thiết bị: {DEVICE}")
+
 try:
-    # Thử tải từ disk trước
-    ds = load_from_disk(dataset_cache)
-    logging.info(f"Đã tải dữ liệu từ {dataset_cache}")
-except FileNotFoundError:
-    # Nếu không thành công, tải từ Hugging Face
-    logging.info(f"Dataset không tìm thấy tại {dataset_cache}. Tải từ Hugging Face...")
-    try:
-        download_config = DownloadConfig(max_retries=5)  # Use max_retries instead of num_retries
-        ds = load_dataset("doof-ferb/vlsp2020_vinai_100h", cache_dir=dataset_path, download_config=download_config)
-        ds.save_to_disk(dataset_cache)
-        logging.info(f"Đã tải và lưu dữ liệu từ Hugging Face vào {dataset_cache}")
-    except Exception as e:
-        logging.error(f"Lỗi khi tải dữ liệu từ Hugging Face: {e}")
-        raise e
+    # 1. Tải mô hình Whisper đã được fine-tune
+    whisper_model_path = "ElfiDeeper/whisper-base-finetuned-vietnamese"
+    whisper_processor = WhisperProcessor.from_pretrained(whisper_model_path)
+    whisper_model = WhisperForConditionalGeneration.from_pretrained(whisper_model_path).to(DEVICE)
+    logging.info(f"Đã tải thành công mô hình Whisper từ: {whisper_model_path}")
+
+    # 2. Tải mô hình PhoBERT để phân loại ý định
+    phobert_model_path = "vinai/phobert-base"
+    phobert_tokenizer = AutoTokenizer.from_pretrained(phobert_model_path)
+    phobert_model = AutoModelForSequenceClassification.from_pretrained(phobert_model_path, num_labels=3).to(DEVICE)
+    logging.info(f"Đã tải thành công mô hình PhoBERT từ: {phobert_model_path}")
 except Exception as e:
-    logging.error(f"Lỗi khi tải dữ liệu từ disk: {e}")
-    raise e
+    logging.error(f"LỖI NGHIÊM TRỌNG: Không thể tải mô hình khi khởi động. Lỗi: {e}")
 
-# Tải và fine-tune mô hình Whisper
-model = whisper.load_model("base")
-logging.info("Đã tải mô hình Whisper base")
-
-# Fine-tune Whisper (chỉ chạy một lần, sau đó lưu mô hình)
-def fine_tune_whisper():
-    # Chuẩn bị dữ liệu huấn luyện
-    def prepare_dataset(batch):
-        try:
-            audio_data = batch["audio"]["array"]
-            batch["audio_data"] = whisper.pad_or_trim(whisper.log_mel_spectrogram(audio_data))
-            batch["labels"] = batch["transcription"]
-            return batch
-        except Exception as e:
-            logging.error(f"Lỗi khi chuẩn bị dataset: {e}")
-            raise e
-
-    try:
-        train_dataset = ds["train"].map(prepare_dataset, remove_columns=["audio", "transcription"])
-        
-        training_args = TrainingArguments(
-            output_dir="D:\\TTCS\\backend\\whisper_finetuned",
-            num_train_epochs=5,
-            per_device_train_batch_size=4,
-            learning_rate=1e-5,
-            save_steps=500,
-            save_total_limit=2,
-            logging_steps=100,
-        )
-        
-        trainer = Trainer(
-            model=model,
-            args=training_args,
-            train_dataset=train_dataset,
-        )
-        
-        trainer.train()
-        trainer.save_model("D:\\TTCS\\backend\\whisper_finetuned")
-        logging.info("Đã fine-tune và lưu mô hình Whisper")
-    except Exception as e:
-        logging.error(f"Lỗi khi fine-tune mô hình Whisper: {e}")
-        raise e
-
-# Kiểm tra xem mô hình đã được fine-tune chưa, nếu chưa thì fine-tune
-if not os.path.exists("D:\\TTCS\\backend\\whisper_finetuned"):
-    fine_tune_whisper()
-else:
-    model = whisper.load_model("D:\\TTCS\\backend\\whisper_finetuned")
-    logging.info("Đã tải mô hình Whisper đã fine-tune")
-
-# Tối ưu hóa mô hình Whisper
-model = torch.quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torch.qint8)
-logging.info("Đã tối ưu hóa mô hình Whisper bằng quantization")
-
-# Tải PhoBERT
-try:
-    tokenizer = AutoTokenizer.from_pretrained("vinai/phobert-base")
-    nlp_model = AutoModelForSequenceClassification.from_pretrained("vinai/phobert-base", num_labels=3)
-    logging.info("Đã tải mô hình PhoBERT")
-except Exception as e:
-    logging.error(f"Lỗi khi tải mô hình PhoBERT: {e}")
-    raise e
-
-# Hàm lưu vào MySQL
-def save_to_db(audio_path, transcript, response):
+# --- CÁC HÀM XỬ LÝ DATABASE ---
+def save_to_db(audio_filename, transcript, response):
+    """Lưu kết quả vào database."""
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
         query = "INSERT INTO history (audio_path, transcript, response) VALUES (%s, %s, %s)"
-        cursor.execute(query, (audio_path, transcript, response))
+        cursor.execute(query, (audio_filename, transcript, response))
         conn.commit()
-        logging.info(f"Đã lưu vào DB: {audio_path}, {transcript}, {response}")
+        logging.info(f"Đã lưu vào DB: {audio_filename}")
     except Error as e:
         logging.error(f"Lỗi khi lưu vào DB: {e}")
     finally:
-        cursor.close()
-        conn.close()
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
 
-# Hàm nhận diện giọng nói
-def recognize_speech(audio_path):
+# --- CÁC HÀM XỬ LÝ AI ---
+def recognize_speech_from_file(audio_path):
     try:
-        start_time = datetime.now()
-        result = model.transcribe(audio_path, language="vi")
-        transcript = result["text"]
-        end_time = datetime.now()
-        processing_time = (end_time - start_time).total_seconds()
-        logging.info(f"Nhận diện giọng nói: {transcript}, Thời gian xử lý: {processing_time} giây")
-        return transcript
+        speech_array, _ = librosa.load(audio_path, sr=16000)
+        input_features = whisper_processor(speech_array, sampling_rate=16000, return_tensors="pt").input_features.to(DEVICE)
+        predicted_ids = whisper_model.generate(input_features, max_length=256)
+        transcript = whisper_processor.batch_decode(predicted_ids, skip_special_tokens=True, normalize=True)[0]
+        logging.info(f"Nhận diện thành công: {transcript}")
+        return transcript.strip()
     except Exception as e:
         logging.error(f"Lỗi khi nhận diện giọng nói: {e}")
-        raise e
+        return None
 
-# Hàm phân loại ý định
 def classify_intent(text):
     try:
-        inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
-        outputs = nlp_model(**inputs)
+        inputs = phobert_tokenizer(text, return_tensors="pt", truncation=True, padding=True).to(DEVICE)
+        outputs = phobert_model(**inputs)
         predictions = torch.argmax(outputs.logits, dim=1)
-        intent_map = {0: "chào hỏi", 1: "hỏi", 2: "yêu cầu"}
-        return intent_map[predictions.item()]
+        intent_map = {0: "yêu cầu", 1: "hỏi", 2: "chào hỏi"}
+        intent = intent_map.get(predictions.item(), "không xác định")
+        logging.info(f"Văn bản '{text}' -> Ý định: {intent}")
+        return intent
     except Exception as e:
         logging.error(f"Lỗi khi phân loại ý định: {e}")
-        raise e
+        return "không xác định"
 
-# Hàm tạo phản hồi
 def generate_response(text):
-    try:
-        intent = classify_intent(text)
-        logging.info(f"Ý định: {intent}")
-        if intent == "chào hỏi":
-            return "Xin chào! Rất vui được trò chuyện với bạn."
-        elif intent == "hỏi":
-            return "Hôm nay trời nắng, nhiệt độ khoảng 30°C."
-        else:
-            return "Tôi sẽ cố gắng thực hiện yêu cầu của bạn."
-    except Exception as e:
-        logging.error(f"Lỗi khi tạo phản hồi: {e}")
-        raise e
+    intent = classify_intent(text)
+    if intent == "chào hỏi":
+        return "Xin chào! Tôi có thể giúp gì cho bạn?"
+    elif intent == "hỏi":
+        return "Đây là một câu hỏi. Tôi sẽ tìm thông tin cho bạn."
+    else:
+        return "Tôi đã ghi nhận yêu cầu của bạn."
 
-# API xử lý âm thanh
+# --- API ENDPOINTS (CẬP NHẬT ĐỂ GỌI HÀM LƯU DB) ---
+@app.route('/')
+def index():
+    return render_template("index.html")
+
 @app.route("/api/process", methods=["POST"])
 def process_audio():
+    if "audio" not in request.files:
+        return jsonify({"error": "No audio file provided"}), 400
+    audio_file = request.files["audio"]
+    upload_folder = 'uploads'
+    os.makedirs(upload_folder, exist_ok=True)
+    audio_path = os.path.join(upload_folder, audio_file.filename)
     try:
-        if "audio" not in request.files:
-            logging.warning("Không có file âm thanh trong yêu cầu")
-            return jsonify({"error": "No audio file provided"}), 400
-
-        audio_file = request.files["audio"]
-        if not audio_file.filename.endswith(('.wav', '.mp3')):
-            logging.warning(f"Định dạng file không hỗ trợ: {audio_file.filename}")
-            return jsonify({"error": "Only WAV or MP3 files are supported"}), 400
-
-        audio_path = os.path.join("uploads", audio_file.filename)
         audio_file.save(audio_path)
         logging.info(f"Đã lưu file âm thanh tại: {audio_path}")
 
-        transcript = recognize_speech(audio_path)
-        response = generate_response(transcript)
-        save_to_db(audio_path, transcript, response)
+        transcript = recognize_speech_from_file(audio_path)
+        if transcript is None or transcript == "":
+             return jsonify({"transcript": "[Không nhận diện được]", "response": "Xin lỗi, tôi không thể nhận diện được âm thanh. Vui lòng thử lại."})
 
-        return jsonify({"transcript": transcript, "response": response})
+        response_text = generate_response(transcript)
+        
+        # --- GỌI HÀM LƯU VÀO DATABASE ---
+        save_to_db(audio_file.filename, transcript, response_text)
+        
+        return jsonify({"transcript": transcript, "response": response_text})
     except Exception as e:
         logging.error(f"Lỗi trong API /api/process: {e}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "An internal error occurred"}), 500
+    finally:
+        if os.path.exists(audio_path):
+            os.remove(audio_path)
 
-def main():
-    logging.info("Khởi động ứng dụng Speech Recognition...")
+# --- HÀM MAIN (THÊM KIỂM TRA KẾT NỐI DB KHI KHỞI ĐỘNG) ---
+if __name__ == "__main__":
+    # Kiểm tra kết nối database trước khi chạy app
     try:
         conn = mysql.connector.connect(**db_config)
         if conn.is_connected():
-            logging.info("Kết nối MySQL thành công")
-        conn.close()
+            logging.info("Kết nối MySQL thành công khi khởi động.")
+            conn.close()
     except Error as e:
-        logging.error(f"Lỗi kết nối MySQL: {e}")
-        return
-    
-    if "train" in ds:
-        logging.info(f"Tập dữ liệu train có {len(ds['train'])} mẫu")
+        logging.error(f"LỖI KẾT NỐI DATABASE: Không thể kết nối tới MySQL. Vui lòng kiểm tra lại. Lỗi: {e}")
+        # Dừng không chạy app nếu không kết nối được DB
     else:
-        logging.error("Không tìm thấy tập train trong dữ liệu")
-        return
-    
-    app.run(debug=True, host="0.0.0.0", port=5000)
-
-if __name__ == "__main__":
-    main()
+        logging.info("Khởi động Flask server...")
+        app.run(debug=True, host="0.0.0.0", port=5000)
