@@ -1,6 +1,6 @@
 🎯 Dự án Nhận dạng Giọng nói và Phân loại Ý định Tiếng Việt
 
-Đây là dự án xây dựng một ứng dụng web hoàn chỉnh có khả năng nhận diện giọng nói tiếng Việt từ file âm thanh, sau đó phân loại ý định của câu nói đó và đưa ra phản hồi tương ứng. Dự án này là một phần của chương trình Thực tập chuyên ngành (TTCS).
+Đây là dự án xây dựng một ứng dụng web hoàn chỉnh có khả năng nhận diện giọng nói tiếng Việt từ file âm thanh, sau đó phân loại ý định của câu nói đó và đưa ra phản hồi tương ứng. Dự án này là một phần của học phần Thực tập cơ sở (TTCS).
 
 Ứng dụng sử dụng mô hình Whisper đã được tinh chỉnh (fine-tuned) trên dữ liệu tiếng Việt để đạt độ chính xác cao và mô hình PhoBERT để hiểu ngữ nghĩa của văn bản.
 
