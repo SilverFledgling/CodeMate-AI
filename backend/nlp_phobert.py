@@ -32,7 +32,7 @@ logging.info(f"Sử dụng thiết bị: {DEVICE}")
 
 try:
     # 1. Tải mô hình Whisper đã được fine-tune
-    whisper_model_path = "ElfiDeeper/whisper-base-finetuned-vietnamese"
+    whisper_model_path = "Duke03/Whisper-base-finetuned-vietnamese"
     whisper_processor = WhisperProcessor.from_pretrained(whisper_model_path)
     whisper_model = WhisperForConditionalGeneration.from_pretrained(whisper_model_path).to(DEVICE)
     logging.info(f"Đã tải thành công mô hình Whisper từ: {whisper_model_path}")
