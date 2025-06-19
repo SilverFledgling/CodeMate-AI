@@ -106,7 +106,7 @@ Thực hiện các bước sau để chạy dự án trên máy local.
   * Mô hình nhận dạng giọng nói:
 
       * Sử dụng `openai/whisper-base` đã được fine-tune trên tập dữ liệu tiếng Việt để tăng độ chính xác.
-      * Mô hình này được lưu trữ và tải về tự động từ Hugging Face Hub tại địa chỉ: [Duke03/whisper-base-finetuned-vi](https://www.google.com/search?q=https://huggingface.co/Duke03/whisper-base-finetuned-vi).
+      * Mô hình này được lưu trữ và tải về tự động từ Hugging Face Hub tại địa chỉ: [Duke03/Whisper-base-finetuned-vietnamese](https://huggingface.co/Duke03/Whisper-base-finetuned-vietnamese).
   * Mô hình phân loại ý định:
 
       * Sử dụng `vinai/phobert-base`, một mô hình ngôn ngữ mạnh mẽ cho tiếng Việt.
