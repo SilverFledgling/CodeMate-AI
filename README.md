@@ -1,4 +1,4 @@
-# Dự án Nhận dạng Giọng nói và Phân loại Ý định Tiếng Việt
+# 🎯 Dự án Nhận dạng Giọng nói và Phân loại Ý định Tiếng Việt
 
 Đây là dự án xây dựng một ứng dụng web hoàn chỉnh có khả năng nhận diện giọng nói tiếng Việt từ file âm thanh, sau đó phân loại ý định của câu nói đó và đưa ra phản hồi tương ứng. Dự án này là một phần của học phần Thực tập cơ sở (TTCS).
 
