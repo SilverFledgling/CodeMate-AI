@@ -30,8 +30,6 @@
 ```
 TTCS/
 ├── backend/
-│   ├── whisper-finetuned-vi/   # Thư mục chứa model fine-tuned (hiện tại tải từ Hub)
-│   ├── uploads/                # Thư mục tạm để lưu file audio upload
 │   ├── fine_tune_on_colab.py   # Script dùng để fine-tune model trên Colab
 │   ├── nlp_phobert.py          # File server Flask chính, xử lý API
 │   ├── requirements.txt        # Danh sách các thư viện Python cần thiết
