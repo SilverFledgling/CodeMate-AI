@@ -61,7 +61,6 @@ Thực hiện các bước sau để chạy dự án trên máy local.
     ```bash
     git clone https://github.com/ElfiDeeper/ViVRAR.git
     cd ViVRAR
-    # Sau khi clone, bạn có thể đổi tên thư mục TTCS thành VoiceBotProject hoặc tương tự nếu muốn.
     ```
 
 2.  **Tạo cơ sở dữ liệu:**
