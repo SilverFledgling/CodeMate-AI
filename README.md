@@ -28,19 +28,20 @@
 ## 📁 Cấu trúc dự án
 
 
-
-VoiceBotProject/
+'''
+ViVRAR/
 ├── backend/
-│ ├── fine_tune_on_colab.py # Script dùng để fine-tune model trên Colab
-│ ├── nlp_phobert.py # File server Flask chính, xử lý API
-│ ├── requirements.txt # Danh sách các thư viện Python cần thiết
-│ ├── database.sql # Script khởi tạo cơ sở dữ liệu
-│ └── uploads/ # Thư mục tạm thời để lưu trữ file âm thanh tải lên
+│   ├── fine_tune_on_colab.py   # Script dùng để fine-tune model trên Colab
+│   ├── nlp_phobert.py          # File server Flask chính, xử lý API
+│   ├── requirements.txt        # Danh sách các thư viện Python cần thiết
+│   ├── database.sql            # Script khởi tạo cơ sở dữ liệu
+│   └── uploads/                # Thư mục tạm thời để lưu trữ file âm thanh tải lên
 │
 └── frontend/
-├── index.html # Giao diện chính của ứng dụng
-├── script.js # Logic xử lý sự kiện phía client
-└── style.css # Định dạng giao diện
+├── index.html              # Giao diện chính của ứng dụng
+├── script.js               # Logic xử lý sự kiện phía client
+└── style.css               # Định dạng giao diện
+'''
 
 ## 🚀 Hướng dẫn cài đặt và khởi chạy
 
@@ -58,8 +59,8 @@ Thực hiện các bước sau để chạy dự án trên máy local.
 1.  **Clone repository từ GitHub:**
 
     ```bash
-    git clone [https://github.com/ElfiDeeper/TTCS.git](https://github.com/ElfiDeeper/TTCS.git)
-    cd TTCS
+    git clone [https://github.com/ElfiDeeper/ViVRAR.git](https://github.com/ElfiDeeper/ViVRAR.git)
+    cd ViVRAR
     # Sau khi clone, bạn có thể đổi tên thư mục TTCS thành VoiceBotProject hoặc tương tự nếu muốn.
     ```
 
@@ -70,7 +71,7 @@ Thực hiện các bước sau để chạy dự án trên máy local.
 
 3.  **Cài đặt các thư viện Python:**
 
-      * Mở terminal (CMD hoặc Git Bash) trong thư mục gốc của dự án (`TTCS` hoặc tên mới của bạn), sau đó di chuyển vào thư mục `backend`.
+      * Mở terminal (CMD hoặc Git Bash) trong thư mục gốc của dự án (`ViVRAR`), sau đó di chuyển vào thư mục `backend`.
       * Tạo một môi trường ảo (khuyến khích):
         ```bash
         cd backend
