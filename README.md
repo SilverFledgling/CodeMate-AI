@@ -28,7 +28,7 @@
 ## 📁 Cấu trúc dự án
 
 
-'''
+```
 ViVRAR/
 ├── backend/
 │   ├── fine_tune_on_colab.py   # Script dùng để fine-tune model trên Colab
@@ -41,7 +41,7 @@ ViVRAR/
 ├── index.html              # Giao diện chính của ứng dụng
 ├── script.js               # Logic xử lý sự kiện phía client
 └── style.css               # Định dạng giao diện
-'''
+```
 
 ## 🚀 Hướng dẫn cài đặt và khởi chạy
 
