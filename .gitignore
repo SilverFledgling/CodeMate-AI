@@ -4,6 +4,13 @@
 venv/
 node_modules/
 >>>>>>> <commit-hash>
+
+# --- FILE: .gitignore ---
+venv/
+backend/.env
+__pycache__/
+*.pyc
+
 # Bỏ qua thư mục uploads
 
 uploads/

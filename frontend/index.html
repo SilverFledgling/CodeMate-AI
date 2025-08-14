@@ -3,20 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nhận diện giọng nói</title>
+    <title>CodeMate AI - Trợ lý giọng nói Tiếng Việt</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Nhận diện giọng nói và phản hồi</h1>
+        <h1>Trợ lý giọng nói CodeMate AI 🎙️</h1>
+        <p class="subtitle">Tải lên file âm thanh hoặc ghi âm trực tiếp</p>
+
         <div class="input-section">
-            <input type="file" id="audioInput" accept="audio/*">
-            <button onclick="processAudio()">Xử lý</button>
+            <label for="audioInput" class="file-label">Chọn File</label>
+            <input type="file" id="audioInput" accept="audio/*" onchange="displayFileName()">
+            <span id="file-name">Chưa có file nào được chọn</span>
         </div>
+        
+        <div class="record-section">
+            <button id="recordButton" class="btn-record">Ghi âm</button>
+            <button id="stopButton" class="btn-stop" disabled>Dừng</button>
+        </div>
+
+        <button id="processButton">Xử lý</button>
+
+        <div id="status" class="status-hidden"></div>
+
         <div class="result-section">
             <h3>Kết quả:</h3>
-            <p id="transcript"></p>
-            <p id="response"></p>
+            <p><strong>Nhận diện:</strong> <span id="transcript">...</span></p>
+            <p><strong>Phản hồi:</strong> <span id="response">...</span></p>
         </div>
     </div>
     <script src="script.js"></script>

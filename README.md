@@ -1,124 +1,80 @@
-# 🎯 Ứng dụng Nhận diện Giọng nói và Phản hồi Tự động Tiếng Việt
+# CodeMate AI - Trợ Lý Lập Trình Bằng Giọng Nói Tiếng Việt
 
-Đây là dự án xây dựng một ứng dụng web hoàn chỉnh có khả năng nhận diện giọng nói tiếng Việt từ file âm thanh, sau đó phân loại ý định của câu nói đó và đưa ra phản hồi tương ứng.
+**CodeMate AI** là một dự án ứng dụng trí tuệ nhân tạo, cho phép lập trình viên tương tác và đưa ra yêu cầu bằng giọng nói Tiếng Việt để nhận lại các đoạn mã (code snippet), giải thích thuật toán, hoặc các câu trả lời liên quan đến lập trình.
 
-Ứng dụng sử dụng mô hình Whisper đã được tinh chỉnh (fine-tuned) trên dữ liệu tiếng Việt để đạt độ chính xác cao và mô hình PhoBERT để hiểu ngữ nghĩa của văn bản.
+Dự án được xây dựng với mục tiêu tăng tốc độ làm việc, hỗ trợ học tập và tạo ra một phương thức tương tác tự nhiên hơn với máy tính cho cộng đồng lập trình viên Việt Nam.
 
-## ✨ Tính năng chính
-
- * **Nhận dạng giọng nói (Speech-to-Text):** Chuyển đổi file âm thanh (`.m4a`, `.mp3`, `.wav`...) sang văn bản tiếng Việt.
- * **Phân loại ý định (Intent Classification):** Phân loại văn bản đã nhận dạng thành các ý định cơ bản như "chào hỏi", "hỏi", "yêu cầu".
- * **Phản hồi thông minh:** Đưa ra câu trả lời dựa trên ý định đã được phân loại.
- * **Giao diện Web:** Giao diện người dùng đơn giản, dễ sử dụng để tải file lên và xem kết quả.
- * **Backend Flask:** Server backend được xây dựng bằng Flask, nhẹ và hiệu quả.
-
-## 🛠️ Công nghệ sử dụng
-
- * **Backend:**
-      * **Ngôn ngữ:** Python
-      * **Web Framework:** Flask
-      * **AI/ML:** PyTorch, Transformers, Datasets, Accelerate, PEFT
-      * **Xử lý âm thanh:** Librosa, SoundFile
-      * **Cơ sở dữ liệu:** MySQL (dùng để lưu trữ lịch sử - đang trong quá trình tích hợp)
- * **Frontend:**
-      * HTML5
-      * CSS3
-      * JavaScript (dùng `fetch` API để gọi backend)
-
-## 📁 Cấu trúc dự án
+![Giao diện CodeMate AI](./images/screenshot.png) 
 
 
-```
-ViVRAR/
-├── backend/
-│   ├── fine_tune_on_colab.py   # Script dùng để fine-tune model trên Colab
-│   ├── nlp_phobert.py          # File server Flask chính, xử lý API
-│   ├── requirements.txt        # Danh sách các thư viện Python cần thiết
-│   ├── database.sql            # Script khởi tạo cơ sở dữ liệu
-│   └── uploads/                # Thư mục tạm thời để lưu trữ file âm thanh tải lên
-│
-└── frontend/
-├── index.html              # Giao diện chính của ứng dụng
-├── script.js               # Logic xử lý sự kiện phía client
-└── style.css               # Định dạng giao diện
-```
+## ✨ Tính Năng Nổi Bật
 
-## 🚀 Hướng dẫn cài đặt và khởi chạy
+* **Nhận diện giọng nói Tiếng Việt**: Sử dụng mô hình **Whisper** để đạt độ chính xác cao khi chuyển đổi giọng nói thành văn bản.
+* **Phản hồi Thông minh**: Tích hợp **OpenAI API** để hiểu ý định người dùng và tạo ra các câu trả lời, đoạn mã và giải thích chất lượng.
+* **Giao diện Web Trực quan**: Giao diện người dùng đơn giản, dễ sử dụng được xây dựng bằng HTML, CSS và JavaScript.
+* **Kiến trúc Backend Mạnh mẽ**: Sử dụng **Flask (Python)** để xử lý các tác vụ AI một cách hiệu quả.
 
-Thực hiện các bước sau để chạy dự án trên máy local.
+## 🚀 Cài Đặt và Chạy Dự Án
 
-### 1. Yêu cầu tiên quyết
+### Yêu Cầu
+-   Python 3.9+
+-   Git
+-   Một API key từ OpenAI
 
- * Đã cài đặt Python 3.9+
- * Đã cài đặt Git.
- * Đã cài đặt và khởi động **MySQL Server**.
- * Đã cài đặt **FFmpeg** và thêm nó vào biến môi trường PATH (để xử lý file `.m4a`).
+### Hướng Dẫn Cài Đặt
 
-### 2. Cài đặt
-
-1.  **Clone repository từ GitHub:**
-
+1.  **Clone repository về máy:**
     ```bash
-    git clone https://github.com/ElfiDeeper/ViVRAR.git
-    cd ViVRAR
+    git clone [https://github.com/ElfiDeeper/CodeMate-AI.git](https://github.com/ElfiDeeper/CodeMate-AI.git)
+    cd CodeMate-AI
     ```
 
-2.  **Tạo cơ sở dữ liệu:**
-
-      * Kết nối vào MySQL Server của bạn (dùng MySQL Workbench hoặc dòng lệnh).
-      * Chạy toàn bộ các lệnh trong file `backend/database.sql` để tạo database `speech_recognition` và bảng `history`.
-
-3.  **Cài đặt các thư viện Python:**
-
-      * Mở terminal (CMD hoặc Git Bash) trong thư mục gốc của dự án (`ViVRAR`), sau đó di chuyển vào thư mục `backend`.
-      * Tạo một môi trường ảo (khuyến khích):
-        ```bash
-        cd backend
-        python -m venv venv
-        # Trên Windows
-        venv\Scripts\activate
-        # Trên macOS/Linux
-        source venv/bin/activate
-        ```
-      * Cài đặt tất cả các gói cần thiết:
-        ```bash
-        pip install -r requirements.txt
-        ```
-
-### 3. Khởi chạy ứng dụng
-
-1.  Hãy đảm bảo bạn đang ở trong thư mục `backend` và môi trường ảo đã được kích hoạt.
-2.  Chạy server Flask:
+2.  **Tạo và kích hoạt môi trường ảo:**
     ```bash
-    python nlp_phobert.py
+    python -m venv venv
+    # Trên Windows
+    .\venv\Scripts\activate
+    # Trên MacOS/Linux
+    source venv/bin/activate
     ```
-3.  Nếu không có lỗi, server sẽ chạy và lắng nghe ở địa chỉ `http://127.0.0.1:5000`.
 
-### 4. Sử dụng
+3.  **Cài đặt các thư viện cần thiết:**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-1.  Mở trình duyệt web của bạn và truy cập: `http://127.0.0.1:5000`.
-2.  Nhấn nút "Choose File" để chọn một file âm thanh từ máy tính.
-3.  Nhấn nút "Xử lý".
-4.  Chờ trong giây lát để server xử lý, kết quả phiên âm và phản hồi sẽ hiện ra trên trang.
+4.  **Cấu hình API Key:**
+    -   Tạo một file mới tên là `.env` trong thư mục `backend`.
+    -   Thêm API key của bạn vào file `.env` như sau (thay `YOUR_API_KEY_HERE` bằng key thật của bạn):
+        ```
+        OPENAI_API_KEY="YOUR_API_KEY_HERE"
+        ```
 
-## 🧠 Thông tin về Mô hình AI và Dữ liệu
+5.  **Chạy Backend Server:**
+    ```bash
+    cd backend
+    python nlp_main.py
+    ```
+    Server sẽ chạy tại `http://127.0.0.1:5000`.
 
- * **Mô hình nhận dạng giọng nói:**
+6.  **Mở Giao diện Người dùng:**
+    -   Mở file `frontend/index.html` bằng trình duyệt của bạn.
 
-      * Sử dụng `openai/whisper-base` đã được fine-tune trên tập dữ liệu tiếng Việt để tăng độ chính xác.
-      * **Tập dữ liệu huấn luyện:** Dự án sử dụng tập dữ liệu [Common Voice 13.0](https://huggingface.co/datasets/mozilla-foundation/common_voice_13_0/tree/main) của Mozilla Foundation.
-      * Mô hình này được lưu trữ và tải về tự động từ Hugging Face Hub tại địa chỉ: [Duke03/Whisper-base-finetuned-vietnamese](https://huggingface.co/Duke03/Whisper-base-finetuned-vietnamese/tree/main).
+Bây giờ bạn có thể bắt đầu sử dụng ứng dụng!
 
- * **Mô hình phân loại ý định:**
+## 🛠️ Công Nghệ Sử Dụng
 
-      * Sử dụng `vinai/phobert-base`, một mô hình ngôn ngữ mạnh mẽ cho tiếng Việt.
-      * Mô hình được tải trực tiếp từ Hugging Face Hub.
+-   **Frontend**: HTML, CSS, JavaScript
+-   **Backend**: Python, Flask
+-   **AI/ML**:
+    -   **Speech-to-Text**: `openai/whisper-small` (hoặc mô hình Whisper khác)
+    -   **Language Understanding & Generation**: OpenAI API (`gpt-5-nano`)
+-   **Thư viện Python**: `transformers`, `torch`, `librosa`, `openai`, `flask_cors`, `python-dotenv`, `mysql-connector-python`
 
-## 🔮 Hướng phát triển trong tương lai
+## 🤝 Đóng Góp
 
- * Hoàn thiện và tích hợp lại tính năng lưu lịch sử xử lý vào database MySQL.
- * Fine-tune mô hình PhoBERT trên một tập dữ liệu phân loại ý định cụ thể để tăng độ chính xác, bao gồm việc mở rộng fine-tuning với cả tập validation và tập test để cải thiện độ nhận dạng tiếng Việt chính xác hơn.
- * Cải thiện giao diện người dùng, thêm tính năng ghi âm trực tiếp trên trình duyệt.
- * Đóng gói dự án bằng Docker để dễ dàng triển khai.
+Mọi sự đóng góp để cải thiện dự án đều được chào đón! Vui lòng tạo một `Pull Request` hoặc mở một `Issue` để thảo luận về những thay đổi bạn muốn thực hiện.
 
------
+## 📄 Giấy Phép
+
+Dự án này được cấp phép theo Giấy phép MIT.

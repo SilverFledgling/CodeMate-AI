@@ -1,10 +1,13 @@
+# --- FILE: backend/requirements.txt ---
+
 # Flask and Web Server
 flask==2.3.2
 flask-cors
 
-# Hugging Face Libraries (for both training and inference)
-transformers==4.38.2
-datasets>=2.19.0
+gunicorn # Thêm Gunicorn để chạy production server
+
+# Hugging Face Libraries
+datasets==2.19.0
 accelerate==0.29.3
 peft==0.9.0
 huggingface_hub
@@ -17,3 +20,9 @@ numpy==1.23.5
 
 # Database Connector
 mysql-connector-python==8.0.33
+
+# API key file: .env
+python-dotenv
+
+# Để gọi API của OpenAI
+openai==1.99.9
