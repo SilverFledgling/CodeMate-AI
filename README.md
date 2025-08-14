@@ -67,7 +67,7 @@ Bây giờ bạn có thể bắt đầu sử dụng ứng dụng!
 -   **Frontend**: HTML, CSS, JavaScript
 -   **Backend**: Python, Flask
 -   **AI/ML**:
-    -   **Speech-to-Text**: `openai/whisper-small` (hoặc mô hình Whisper khác)
+    -   **Speech-to-Text**: `openai/whisper-medium`
     -   **Language Understanding & Generation**: OpenAI API (`gpt-5-nano`)
 -   **Thư viện Python**: `transformers`, `torch`, `librosa`, `openai`, `flask_cors`, `python-dotenv`, `mysql-connector-python`
 
