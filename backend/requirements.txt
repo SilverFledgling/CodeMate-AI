@@ -1,28 +1,37 @@
-# --- FILE: backend/requirements.txt ---
-
-# Flask and Web Server
+# === Web Server ===
+# Flask framework for building the web application
 flask==2.3.2
-flask-cors
+# Handles Cross-Origin Resource Sharing for Flask
+flask-cors==4.0.1
+# Production-ready WSGI server for Unix-like systems (Linux/macOS)
+gunicorn==22.0.0
+# Alternative server for Windows development/deployment
+waitress==3.0.0
 
-gunicorn # Thêm Gunicorn để chạy production server
-
-# Hugging Face Libraries
-datasets==2.19.0
-accelerate==0.29.3
-peft==0.9.0
-huggingface_hub
-
-# Core AI & Audio Libraries
-torch
-soundfile==0.12.1
+# === Core AI & Audio Libraries ===
+# Deep learning framework
+torch==2.3.0
+# For loading and processing audio files
 librosa==0.10.1
-numpy==1.23.5
+# Required by librosa for certain audio formats
+soundfile==0.12.1
+# Fundamental package for numerical computations
+numpy==1.26.4
 
-# Database Connector
-mysql-connector-python==8.0.33
+# === Hugging Face Libraries ===
+# Core library for using 🤗 models and pipelines
+transformers==4.41.2
+# Utility for downloading models/datasets from the Hub
+huggingface_hub==0.23.2
+# Speeds up model loading and execution
+accelerate==0.30.1
 
-# API key file: .env
-python-dotenv
-
-# Để gọi API của OpenAI
+# === APIs and Utilities ===
+# Official Python client for the OpenAI API
 openai==1.99.9
+# For loading environment variables from .env files
+python-dotenv==1.0.1
+
+# === Database Connector ===
+# Driver for connecting to MySQL databases
+mysql-connector-python==8.4.0
