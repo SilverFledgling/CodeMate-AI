@@ -3,35 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeMate AI - Trợ lý giọng nói Tiếng Việt</title>
+    <title>CodeMate AI - Trợ lý lập trình thông minh</title>
+    <link rel="icon" type="image/png" href="/CodeMate_AI.png">
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Marked.js for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>Trợ lý giọng nói CodeMate AI 🎙️</h1>
-        <p class="subtitle">Tải lên file âm thanh hoặc ghi âm trực tiếp</p>
-
-        <div class="input-section">
-            <label for="audioInput" class="file-label">Chọn File</label>
-            <input type="file" id="audioInput" accept="audio/*" onchange="displayFileName()">
-            <span id="file-name">Chưa có file nào được chọn</span>
-        </div>
+    <div class="app-container">
+        <!-- ==================== SIDEBAR ==================== -->
+        <aside class="sidebar" id="sidebar">
+            <!-- User Info Header -->
+            <div class="sidebar-header">
+                <div class="user-info">
+                    <div class="user-avatar" id="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name" id="user-name">Loading...</div>
+                        <div class="user-email" id="user-email">user@email.com</div>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logout-btn" title="Đăng xuất">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+            
+            <!-- New Chat Button -->
+            <button class="new-chat-btn" id="new-chat-btn">
+                <i class="fas fa-plus"></i>
+                Trò chuyện mới
+            </button>
+            
+            <!-- Conversations List -->
+            <div class="conversations-list" id="conversations-list">
+                <div class="empty-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Đang tải lịch sử...</p>
+                </div>
+            </div>
+        </aside>
         
-        <div class="record-section">
-            <button id="recordButton" class="btn-record">Ghi âm</button>
-            <button id="stopButton" class="btn-stop" disabled>Dừng</button>
-        </div>
-
-        <button id="processButton">Xử lý</button>
-
-        <div id="status" class="status-hidden"></div>
-
-        <div class="result-section">
-            <h3>Kết quả:</h3>
-            <p><strong>Nhận diện:</strong> <span id="transcript">...</span></p>
-            <p><strong>Phản hồi:</strong> <span id="response">...</span></p>
-        </div>
+        <!-- ==================== MAIN CONTENT ==================== -->
+        <main class="main-content">
+            <!-- Chat Header -->
+            <header class="chat-header">
+                <div class="header-left">
+                    <button class="toggle-sidebar-btn" id="toggle-sidebar" title="Hiện/Ẩn Sidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="chat-title">
+                        <h1 id="chat-title">CodeMate AI</h1>
+                        <p>Trợ lý lập trình thông minh của bạn</p>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Error Banner -->
+            <div id="error-banner" class="error-banner" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="error-text"></span>
+            </div>
+            
+            <!-- Chat Log -->
+            <div class="chat-log" id="chat-log">
+                <!-- Welcome screen hoặc messages sẽ được insert vào đây -->
+                <div class="welcome-screen">
+                    <h2>👋 Xin chào! Tôi là CodeMate</h2>
+                    <p>Tôi có thể giúp bạn với lập trình, công nghệ và nhiều điều khác. Hãy bắt đầu cuộc trò chuyện!</p>
+                    <div class="welcome-suggestions">
+                        <div class="suggestion-card" onclick="useSuggestion('Giải thích async/await trong JavaScript')">
+                            <i class="fas fa-code"></i>
+                            <h3>Học lập trình</h3>
+                            <p>Giải thích các khái niệm lập trình</p>
+                        </div>
+                        <div class="suggestion-card" onclick="useSuggestion('Viết code Python để đọc file CSV')">
+                            <i class="fas fa-terminal"></i>
+                            <h3>Viết code</h3>
+                            <p>Tạo code mẫu cho dự án</p>
+                        </div>
+                        <div class="suggestion-card" onclick="useSuggestion('Debug lỗi này trong code của tôi')">
+                            <i class="fas fa-bug"></i>
+                            <h3>Debug code</h3>
+                            <p>Tìm và sửa lỗi trong code</p>
+                        </div>
+                        <div class="suggestion-card" onclick="useSuggestion('Tối ưu hóa thuật toán tìm kiếm')">
+                            <i class="fas fa-rocket"></i>
+                            <h3>Tối ưu hóa</h3>
+                            <p>Cải thiện hiệu suất code</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Typing Indicator -->
+            <div class="typing-indicator" id="ai-typing-indicator" style="display: none;">
+                <div class="message-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="typing-dots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+            
+            <!-- Chat Input Container -->
+            <div class="chat-input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="text-input" 
+                        placeholder="Nhập câu hỏi của bạn... (Shift+Enter để xuống dòng)"
+                        rows="1"
+                    ></textarea>
+                    <button class="control-button" id="mic-button" title="Ghi âm (Click để bắt đầu/dừng)">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="control-button" id="send-button" title="Gửi tin nhắn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
     </div>
+    
+    <!-- Script chính -->
     <script src="script.js"></script>
 </body>
 </html>

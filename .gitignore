@@ -48,3 +48,6 @@ tmp*/
 #Bỏ qua file hệ thống
 .DS_Store
 Thumbs.db
+
+# Bỏ qua thư mục mô hình Whisper
+backend/whisper-medium-vi-ct2-int8/

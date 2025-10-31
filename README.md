@@ -1,80 +1,141 @@
-# CodeMate AI - Trợ Lý Lập Trình Bằng Giọng Nói Tiếng Việt
+# CodeMate AI 🤖
 
-**CodeMate AI** là một dự án ứng dụng trí tuệ nhân tạo, cho phép lập trình viên tương tác và đưa ra yêu cầu bằng giọng nói Tiếng Việt để nhận lại các đoạn mã (code snippet), giải thích thuật toán, hoặc các câu trả lời liên quan đến lập trình.
+\<p align="center"\>
+\<img src="CodeMate\_AI.jpg" alt="CodeMate AI Logo" width="150"/\>
+\</p\>
 
-Dự án được xây dựng với mục tiêu tăng tốc độ làm việc, hỗ trợ học tập và tạo ra một phương thức tương tác tự nhiên hơn với máy tính cho cộng đồng lập trình viên Việt Nam.
+**CodeMate AI** là một trợ lý lập trình thông minh, được xây dựng dưới dạng một ứng dụng chat nền tảng web. Dự án sử dụng mô hình GPT-4o của OpenAI để trả lời các câu hỏi, cùng với mô hình Whisper để xử lý đầu vào bằng giọng nói.
 
-![Giao diện CodeMate AI](./images/screenshot.png) 
+## ✨ Tính năng chính
 
+  * **Xác thực người dùng:** Đăng nhập/Đăng ký bằng email (local) hoặc tài khoản Google (OAuth 2.0).
+  * **Giao diện Chat trực quan:** Giao diện chat hiện đại, thân thiện, tương tự như các ứng dụng chat AI phổ biến.
+  * **Hỗ trợ Markdown:** Phản hồi từ AI được render dưới dạng Markdown, giúp hiển thị code, danh sách, và các định dạng văn bản một cách rõ ràng.
+  * **Lịch sử cuộc trò chuyện:** Tự động lưu và hiển thị lịch sử các cuộc hội thoại, cho phép người dùng quay lại các cuộc trò chuyện trước đó.
+  * **Nhận diện giọng nói (Speech-to-Text):** Người dùng có thể nhập liệu bằng giọng nói thông qua micro, sử dụng [Faster-Whisper](https://github.com/SYSTRAN/faster-whisper) để chuyển đổi thành văn bản.
+  * **Backend hiệu suất cao:** Xây dựng trên nền tảng Flask (Python) với connection pool cho MySQL để quản lý kết nối cơ sở dữ liệu hiệu quả.
 
-## ✨ Tính Năng Nổi Bật
+## 🛠️ Công nghệ sử dụng
 
-* **Nhận diện giọng nói Tiếng Việt**: Sử dụng mô hình **Whisper** để đạt độ chính xác cao khi chuyển đổi giọng nói thành văn bản.
-* **Phản hồi Thông minh**: Tích hợp **OpenAI API** để hiểu ý định người dùng và tạo ra các câu trả lời, đoạn mã và giải thích chất lượng.
-* **Giao diện Web Trực quan**: Giao diện người dùng đơn giản, dễ sử dụng được xây dựng bằng HTML, CSS và JavaScript.
-* **Kiến trúc Backend Mạnh mẽ**: Sử dụng **Flask (Python)** để xử lý các tác vụ AI một cách hiệu quả.
+| Phân loại | Công nghệ |
+| :--- | :--- |
+| **Backend** | Python, Flask, Gunicorn (cho production) |
+| **Frontend** | HTML5, CSS3, Vanilla JavaScript |
+| **Cơ sở dữ liệu** | MySQL |
+| **AI & NLP** | OpenAI API (GPT-4o), Faster-Whisper (Speech-to-Text) |
+| **Xác thực** | Google OAuth 2.0, Bcrypt (cho mật khẩu local) |
 
-## 🚀 Cài Đặt và Chạy Dự Án
+## 📋 Yêu cầu cài đặt
 
-### Yêu Cầu
--   Python 3.9+
--   Git
--   Một API key từ OpenAI
+Trước khi bắt đầu, hãy đảm bảo bạn đã cài đặt các công cụ sau trên máy của mình:
 
-### Hướng Dẫn Cài Đặt
+  * [Python 3.9+](https://www.python.org/)
+  * [suspicious link removed]
+  * (Khuyên dùng cho Whisper) [ffmpeg](https://ffmpeg.org/download.html)
 
-1.  **Clone repository về máy:**
+## ⚙️ Cài đặt và Chạy dự án
+
+### 1\. Clone dự án
+
+```bash
+git clone [URL-repository-cua-ban]
+cd [ten-thu-muc-du-an]
+```
+
+### 2\. Cài đặt Backend (Python)
+
+Tạo một môi trường ảo và cài đặt các thư viện cần thiết.
+
+```bash
+# Tạo môi trường ảo
+python -m venv venv
+
+# Kích hoạt môi trường ảo
+# Trên Windows:
+venv\Scripts\activate
+# Trên macOS/Linux:
+source venv/bin/activate
+
+# Cài đặt các thư viện từ requirements.txt
+pip install -r requirements.txt
+```
+
+### 3\. Cài đặt Cơ sở dữ liệu (MySQL)
+
+1.  Mở trình quản lý MySQL của bạn (ví dụ: MySQL Workbench, DBeaver, hoặc command line).
+2.  Tạo một database mới (tên mặc định trong file `.env` là `codemate_db`).
+    ```sql
+    CREATE DATABASE codemate_db;
+    ```
+3.  Sử dụng database vừa tạo và chạy file `database.sql` để khởi tạo các bảng (users, conversations, messages).
     ```bash
-    git clone [https://github.com/ElfiDeeper/CodeMate-AI.git](https://github.com/ElfiDeeper/CodeMate-AI.git)
-    cd CodeMate-AI
+    # Từ terminal
+    mysql -u [ten_user] -p codemate_db < database.sql
     ```
 
-2.  **Tạo và kích hoạt môi trường ảo:**
-    ```bash
-    python -m venv venv
-    # Trên Windows
-    .\venv\Scripts\activate
-    # Trên MacOS/Linux
-    source venv/bin/activate
-    ```
+### 4\. Cấu hình Biến môi trường
 
-3.  **Cài đặt các thư viện cần thiết:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+Đây là bước quan trọng nhất. Tạo một file tên là `.env` trong thư mục gốc của dự án (cùng cấp với `nlp_main.py`).
 
-4.  **Cấu hình API Key:**
-    -   Tạo một file mới tên là `.env` trong thư mục `backend`.
-    -   Thêm API key của bạn vào file `.env` như sau (thay `YOUR_API_KEY_HERE` bằng key thật của bạn):
-        ```
-        OPENAI_API_KEY="YOUR_API_KEY_HERE"
-        ```
+**Nội dung file `.env`:**
 
-5.  **Chạy Backend Server:**
-    ```bash
-    cd backend
-    python nlp_main.py
-    ```
-    Server sẽ chạy tại `http://127.0.0.1:5000`.
+> **Cảnh báo bảo mật:** KHÔNG BAO GIỜ chia sẻ file `.env` thật của bạn. Sử dụng file này làm mẫu và thay thế bằng các giá trị của bạn.
 
-6.  **Mở Giao diện Người dùng:**
-    -   Mở file `frontend/index.html` bằng trình duyệt của bạn.
+```ini
+# API Key của OpenAI
+OPENAI_API_KEY=sk-YOUR_OPENAI_API_KEY_HERE
 
-Bây giờ bạn có thể bắt đầu sử dụng ứng dụng!
+# Cấu hình cơ sở dữ liệu MySQL
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=your_mysql_username
+DB_PASSWORD=your_mysql_password
+DB_NAME=codemate_db
 
-## 🛠️ Công Nghệ Sử Dụng
+# Khóa bí mật của Flask để quản lý session
+SECRET_KEY=YOUR_VERY_STRONG_RANDOM_SECRET_KEY
 
--   **Frontend**: HTML, CSS, JavaScript
--   **Backend**: Python, Flask
--   **AI/ML**:
-    -   **Speech-to-Text**: `Duke03/whisper_medium_finetuned_vi`
-    -   **Language Understanding & Generation**: OpenAI API (`gpt-5-nano`)
--   **Thư viện Python**: `transformers`, `torch`, `librosa`, `openai`, `flask_cors`, `python-dotenv`, `mysql-connector-python`
+# Client ID của Google (lấy từ Google Cloud Console)
+GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com
+```
 
-## 🤝 Đóng Góp
+### 5\. Chạy ứng dụng
 
-Mọi sự đóng góp để cải thiện dự án đều được chào đón! Vui lòng tạo một `Pull Request` hoặc mở một `Issue` để thảo luận về những thay đổi bạn muốn thực hiện.
+Sau khi hoàn tất các bước trên, bạn có thể khởi chạy server Flask:
 
-## 📄 Giấy Phép
+```bash
+# Chế độ phát triển (development)
+flask run
 
-Dự án này được cấp phép theo Giấy phép MIT.
+# Hoặc chạy trực tiếp file
+python nlp_main.py
+```
+
+Ứng dụng sẽ chạy tại `http://localhost:5000`. Bạn có thể truy cập `http://localhost:5000/login.html` để bắt đầu.
+
+-----
+
+## 🌳 Cấu trúc thư mục (Đề xuất)
+
+Dưới đây là cấu trúc thư mục được suy luận từ các file của bạn, giúp dễ dàng quản lý dự án:
+
+```
+/codemate-ai
+|
+|-- /backend
+|   |-- nlp_main.py       # Flask App chính, API routes, Google Auth
+|   |-- database.py       # Module quản lý kết nối và truy vấn DB
+|   |-- requirements.txt  # Danh sách thư viện Python
+|   |-- .env              # (Bí mật) File chứa các khóa API và cấu hình
+|
+|-- /frontend
+|   |-- index.html        # Giao diện chat chính
+|   |-- login.html        # Trang đăng nhập/đăng ký
+|   |-- script.js         # Logic JavaScript phía client
+|   |-- style.css         # CSS cho giao diện
+|   |-- CodeMate_AI.jpg   # Logo
+|
+|-- database.sql            # Script khởi tạo schema cho MySQL
+|-- fine_tuning_on_colab.ipynb # Notebook cho việc fine-tuning (nếu có)
+|-- README.md               # Tài liệu hướng dẫn dự án
+```
