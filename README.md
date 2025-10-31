@@ -2,7 +2,7 @@
 # CodeMate AI 🤖
 
 <p align="center">
-<img src="frontend/CodeMate_AI.jpg" alt="CodeMate AI Logo" width="150"/>
+<img src="images/CodeMate_AI.png" alt="CodeMate AI Logo" width="150"/>
 </p>
 
 Một ứng dụng web sử dụng mô hình Whisper và OpenAI API để tạo thành một trợ lý AI mạnh mẽ, chuyên hỗ trợ các tác vụ lập trình thông qua giao tiếp bằng giọng nói Tiếng Việt.
