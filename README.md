@@ -1,10 +1,10 @@
-````markdown
+
 # CodeMate AI 🤖
 
 <p align="center">
 <img src="images/CodeMate_AI.png" alt="CodeMate AI Logo" width="150"/>
 </p>
-
+````markdown
 Một ứng dụng web sử dụng mô hình Whisper và OpenAI API để tạo thành một trợ lý AI mạnh mẽ, chuyên hỗ trợ các tác vụ lập trình thông qua giao tiếp bằng giọng nói Tiếng Việt.
 
 ## ✨ Tính năng chính
