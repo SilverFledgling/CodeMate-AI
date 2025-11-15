@@ -193,9 +193,9 @@ rm -rf ~/.cache/huggingface
 
 ## 👨‍💻 Tác giả
 
-**Đức Nguyễn**
+**Đức Quý Nguyễn**
 - GitHub: [@SilverFledgling](https://github.com/SilverFledgling)
-- Email: ducnguyenpti2310@gmail.com
+- Email: ducnguyenptit2310@gmail.com
 
 ---
 
