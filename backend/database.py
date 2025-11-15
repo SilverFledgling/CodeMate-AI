@@ -97,7 +97,7 @@ def verify_user(email, password):
             conn.close()
 
 def get_or_create_google_user(google_id, email, full_name, avatar_url):
-    """Lấy hoặc tạo user từ Google OAuth"""
+    """Lấy hoặc tạo user từ Google OAuth - HỖ TRỢ LIÊN KẾT TÀI KHOẢN"""
     conn = None
     cursor = None
     try:
@@ -121,20 +121,43 @@ def get_or_create_google_user(google_id, email, full_name, avatar_url):
             logging.info(f"Cập nhật user Google: {email}")
             return user
         else:
-            # Tạo user mới
-            insert_query = """
-                INSERT INTO users (email, full_name, avatar_url, auth_provider, google_id)
-                VALUES (%s, %s, %s, 'google', %s)
-            """
-            cursor.execute(insert_query, (email, full_name, avatar_url, google_id))
-            conn.commit()
+            # ✅ KIỂM TRA XEM EMAIL ĐÃ TỒN TẠI VỚI AUTH_PROVIDER='LOCAL' CHƯA
+            cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+            existing_user = cursor.fetchone()
             
-            user_id = cursor.lastrowid
-            logging.info(f"Tạo user Google mới: {email}")
-            
-            # Lấy thông tin user vừa tạo
-            cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
-            return cursor.fetchone()
+            if existing_user and existing_user['auth_provider'] == 'local':
+                # ✅ LIÊN KẾT TÀI KHOẢN LOCAL VỚI GOOGLE
+                logging.info(f"🔗 Liên kết tài khoản local với Google: {email}")
+                update_query = """
+                    UPDATE users 
+                    SET auth_provider = 'google', 
+                        google_id = %s, 
+                        avatar_url = %s,
+                        full_name = %s,
+                        last_login = CURRENT_TIMESTAMP
+                    WHERE email = %s
+                """
+                cursor.execute(update_query, (google_id, avatar_url, full_name, email))
+                conn.commit()
+                
+                # Lấy thông tin user sau khi cập nhật
+                cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+                return cursor.fetchone()
+            else:
+                # Tạo user mới
+                insert_query = """
+                    INSERT INTO users (email, full_name, avatar_url, auth_provider, google_id)
+                    VALUES (%s, %s, %s, 'google', %s)
+                """
+                cursor.execute(insert_query, (email, full_name, avatar_url, google_id))
+                conn.commit()
+                
+                user_id = cursor.lastrowid
+                logging.info(f"Tạo user Google mới: {email}")
+                
+                # Lấy thông tin user vừa tạo
+                cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+                return cursor.fetchone()
     except mysql.connector.Error as err:
         logging.error(f"Lỗi xử lý Google user: {err}")
         return None

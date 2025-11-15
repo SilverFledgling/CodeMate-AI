@@ -431,7 +431,8 @@ function addMessageToChatLog(role, content, isMarkdown = false) {
             avatar.textContent = initial.toUpperCase();
         }
     } else {
-        avatar.textContent = 'AI';
+        // ✅ Hiển thị hình chim CM cho AI
+        avatar.innerHTML = '<i class="fas fa-robot" style="font-size: 14px;"></i>';
     }
     
     const contentDiv = document.createElement('div');

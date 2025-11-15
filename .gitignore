@@ -1,53 +1,123 @@
-
-# Bỏ qua virtual enviroment
-<<<<<<< HEAD
-venv/
-node_modules/
->>>>>>> <commit-hash>
-
-# --- FILE: .gitignore ---
-venv/
+# ==================== CRITICAL: ENVIRONMENT & SECRETS ====================
+# Bỏ qua tất cả file .env (chứa API keys, passwords)
+.env
+*.env
+.env.local
+.env.*.local
 backend/.env
+backend/*.env
+
+# ==================== PYTHON ====================
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# Python cache
 __pycache__/
-*.pyc
-
-# Bỏ qua thư mục uploads
-
-uploads/
-backend/uploads/
-=======
-doof-ferb___vlsp2020_vinai_100h/
-
-#Bỏ qua file log
-*.log
-
-# Bỏ qua cache Python
-__pycache__/
+*.py[cod]
+*$py.class
 *.pyc
 *.pycache
+*.so
+.Python
 
-# Bỏ qua build artifacts
-*.egg-info
+# Distribution / packaging
+*.egg-info/
 dist/
 build/
+*.egg
+pip-log.txt
 
-#Bỏ qua model checkpoints
+# ==================== DATABASES ====================
+*.db
+*.sqlite
+*.sqlite3
+
+# ==================== LOGS ====================
+*.log
+logs/
+*.log.*
+
+# ==================== AI MODELS & DATASETS ====================
+# Whisper models
 whisper_finetuned/
+backend/whisper-medium-vi-ct2-int8/
 checkpoints/
-
-# Bỏ qua temporary files
-tmp*/
-*.tmp
-
-# Bỏ qua file dữ liệu lớn
 *.arrow
+
+# Large audio files
 *.wav
 *.mp3
 *.flac
+*.ogg
+*.m4a
 
-#Bỏ qua file hệ thống
+# Datasets
+doof-ferb___vlsp2020_vinai_100h/
+data/
+dataset/
+
+# ==================== UPLOADS & TEMP FILES ====================
+uploads/
+backend/uploads/
+temp_audio/
+tmp*/
+*.tmp
+*.temp
+
+# ==================== NODE.JS (nếu có frontend dependencies) ====================
+node_modules/
+package-lock.json
+yarn.lock
+
+# ==================== OS SPECIFIC ====================
+# macOS
 .DS_Store
-Thumbs.db
+.AppleDouble
+.LSOverride
 
-# Bỏ qua thư mục mô hình Whisper
-backend/whisper-medium-vi-ct2-int8/
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+.directory
+
+# ==================== IDE / EDITORS ====================
+# VS Code
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# ==================== TESTING ====================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ==================== OTHER ====================
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Certificates
+*.pem
+*.key
+*.crt

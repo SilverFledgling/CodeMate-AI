@@ -1,141 +1,217 @@
-# CodeMate AI 🤖
+# 🤖 CodeMate AI
 
-\<p align="center"\>
-\<img src="CodeMate\_AI.jpg" alt="CodeMate AI Logo" width="150"/\>
-\</p\>
+> Trợ lý lập trình thông minh với AI, hỗ trợ chat văn bản và giọng nói (tiếng Việt)
 
-**CodeMate AI** là một trợ lý lập trình thông minh, được xây dựng dưới dạng một ứng dụng chat nền tảng web. Dự án sử dụng mô hình GPT-4o của OpenAI để trả lời các câu hỏi, cùng với mô hình Whisper để xử lý đầu vào bằng giọng nói.
+![CodeMate AI Logo](images/CodeMate_AI.png)
 
-## ✨ Tính năng chính
+## 📸 Giao diện ứng dụng
 
-  * **Xác thực người dùng:** Đăng nhập/Đăng ký bằng email (local) hoặc tài khoản Google (OAuth 2.0).
-  * **Giao diện Chat trực quan:** Giao diện chat hiện đại, thân thiện, tương tự như các ứng dụng chat AI phổ biến.
-  * **Hỗ trợ Markdown:** Phản hồi từ AI được render dưới dạng Markdown, giúp hiển thị code, danh sách, và các định dạng văn bản một cách rõ ràng.
-  * **Lịch sử cuộc trò chuyện:** Tự động lưu và hiển thị lịch sử các cuộc hội thoại, cho phép người dùng quay lại các cuộc trò chuyện trước đó.
-  * **Nhận diện giọng nói (Speech-to-Text):** Người dùng có thể nhập liệu bằng giọng nói thông qua micro, sử dụng [Faster-Whisper](https://github.com/SYSTRAN/faster-whisper) để chuyển đổi thành văn bản.
-  * **Backend hiệu suất cao:** Xây dựng trên nền tảng Flask (Python) với connection pool cho MySQL để quản lý kết nối cơ sở dữ liệu hiệu quả.
+### Trang đăng nhập
+![Login Page](images/login-page.png)
+
+### Giao diện chat chính
+![Main Chat Interface](images/main-interface.png)
+
+---
+
+## ✨ Tính năng
+
+- 🎙️ **Chat bằng giọng nói**: Hỗ trợ nhận diện giọng nói tiếng Việt với Whisper
+- 💬 **Chat văn bản**: Giao diện hiện đại, hỗ trợ Markdown
+- 🔐 **Xác thực đa dạng**: Đăng nhập bằng Email/Password hoặc Google OAuth
+- 💾 **Lưu lịch sử**: Quản lý nhiều cuộc hội thoại
+- 🎨 **Giao diện đẹp mắt**: Dark theme, responsive
+- 🚀 **Hiệu năng cao**: Sử dụng connection pool, async processing
+
+---
 
 ## 🛠️ Công nghệ sử dụng
 
-| Phân loại | Công nghệ |
-| :--- | :--- |
-| **Backend** | Python, Flask, Gunicorn (cho production) |
-| **Frontend** | HTML5, CSS3, Vanilla JavaScript |
-| **Cơ sở dữ liệu** | MySQL |
-| **AI & NLP** | OpenAI API (GPT-4o), Faster-Whisper (Speech-to-Text) |
-| **Xác thực** | Google OAuth 2.0, Bcrypt (cho mật khẩu local) |
+### Backend
+- **Flask** - Web framework
+- **OpenAI GPT-4** - AI model chính
+- **Faster-Whisper** - Speech-to-text (tiếng Việt)
+- **MySQL** - Database
+- **Google OAuth 2.0** - Xác thực
 
-## 📋 Yêu cầu cài đặt
+### Frontend
+- **Vanilla JavaScript** - Không framework
+- **Marked.js** - Markdown rendering
+- **Font Awesome** - Icons
+- **CSS3** - Styling hiện đại
 
-Trước khi bắt đầu, hãy đảm bảo bạn đã cài đặt các công cụ sau trên máy của mình:
+---
 
-  * [Python 3.9+](https://www.python.org/)
-  * [suspicious link removed]
-  * (Khuyên dùng cho Whisper) [ffmpeg](https://ffmpeg.org/download.html)
+## 📦 Cài đặt
 
-## ⚙️ Cài đặt và Chạy dự án
-
-### 1\. Clone dự án
+### 1. Clone repository
 
 ```bash
-git clone [URL-repository-cua-ban]
-cd [ten-thu-muc-du-an]
+git clone https://github.com/SilverFledgling/CodeMate-AI.git
+cd CodeMate-AI
 ```
 
-### 2\. Cài đặt Backend (Python)
-
-Tạo một môi trường ảo và cài đặt các thư viện cần thiết.
+### 2. Cài đặt dependencies
 
 ```bash
-# Tạo môi trường ảo
-python -m venv venv
-
-# Kích hoạt môi trường ảo
-# Trên Windows:
-venv\Scripts\activate
-# Trên macOS/Linux:
-source venv/bin/activate
-
-# Cài đặt các thư viện từ requirements.txt
+# Backend
+cd backend
 pip install -r requirements.txt
 ```
 
-### 3\. Cài đặt Cơ sở dữ liệu (MySQL)
-
-1.  Mở trình quản lý MySQL của bạn (ví dụ: MySQL Workbench, DBeaver, hoặc command line).
-2.  Tạo một database mới (tên mặc định trong file `.env` là `codemate_db`).
-    ```sql
-    CREATE DATABASE codemate_db;
-    ```
-3.  Sử dụng database vừa tạo và chạy file `database.sql` để khởi tạo các bảng (users, conversations, messages).
-    ```bash
-    # Từ terminal
-    mysql -u [ten_user] -p codemate_db < database.sql
-    ```
-
-### 4\. Cấu hình Biến môi trường
-
-Đây là bước quan trọng nhất. Tạo một file tên là `.env` trong thư mục gốc của dự án (cùng cấp với `nlp_main.py`).
-
-**Nội dung file `.env`:**
-
-> **Cảnh báo bảo mật:** KHÔNG BAO GIỜ chia sẻ file `.env` thật của bạn. Sử dụng file này làm mẫu và thay thế bằng các giá trị của bạn.
-
-```ini
-# API Key của OpenAI
-OPENAI_API_KEY=sk-YOUR_OPENAI_API_KEY_HERE
-
-# Cấu hình cơ sở dữ liệu MySQL
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=your_mysql_username
-DB_PASSWORD=your_mysql_password
-DB_NAME=codemate_db
-
-# Khóa bí mật của Flask để quản lý session
-SECRET_KEY=YOUR_VERY_STRONG_RANDOM_SECRET_KEY
-
-# Client ID của Google (lấy từ Google Cloud Console)
-GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com
-```
-
-### 5\. Chạy ứng dụng
-
-Sau khi hoàn tất các bước trên, bạn có thể khởi chạy server Flask:
+### 3. Cấu hình Database
 
 ```bash
-# Chế độ phát triển (development)
-flask run
+# Đăng nhập MySQL
+mysql -u root -p
 
-# Hoặc chạy trực tiếp file
+# Chạy script tạo database
+mysql -u root -p < backend/database.sql
+```
+
+### 4. Cấu hình Environment Variables
+
+Tạo file `.env` trong thư mục `backend/`:
+
+```bash
+cp .env.example .env
+```
+
+Chỉnh sửa file `.env` với thông tin của bạn:
+
+```env
+OPENAI_API_KEY=your_openai_api_key_here
+DB_PORT=3306
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=codemate_db
+SECRET_KEY=your_secret_key_here
+GOOGLE_CLIENT_ID=your_google_client_id_here
+```
+
+**Lấy API Keys:**
+- OpenAI API Key: https://platform.openai.com/api-keys
+- Google Client ID: https://console.cloud.google.com/apis/credentials
+
+### 5. Chạy ứng dụng
+
+```bash
+# Trong thư mục backend/
 python nlp_main.py
 ```
 
-Ứng dụng sẽ chạy tại `http://localhost:5000`. Bạn có thể truy cập `http://localhost:5000/login.html` để bắt đầu.
+Truy cập: **http://localhost:5000**
 
------
+---
 
-## 🌳 Cấu trúc thư mục (Đề xuất)
-
-Dưới đây là cấu trúc thư mục được suy luận từ các file của bạn, giúp dễ dàng quản lý dự án:
+## 📂 Cấu trúc thư mục
 
 ```
-/codemate-ai
-|
-|-- /backend
-|   |-- nlp_main.py       # Flask App chính, API routes, Google Auth
-|   |-- database.py       # Module quản lý kết nối và truy vấn DB
-|   |-- requirements.txt  # Danh sách thư viện Python
-|   |-- .env              # (Bí mật) File chứa các khóa API và cấu hình
-|
-|-- /frontend
-|   |-- index.html        # Giao diện chat chính
-|   |-- login.html        # Trang đăng nhập/đăng ký
-|   |-- script.js         # Logic JavaScript phía client
-|   |-- style.css         # CSS cho giao diện
-|   |-- CodeMate_AI.jpg   # Logo
-|
-|-- database.sql            # Script khởi tạo schema cho MySQL
-|-- fine_tuning_on_colab.ipynb # Notebook cho việc fine-tuning (nếu có)
-|-- README.md               # Tài liệu hướng dẫn dự án
+CodeMate-AI/
+│
+├── backend/
+│   ├── nlp_main.py          # Flask server chính
+│   ├── database.py          # Database operations
+│   ├── database.sql         # Database schema
+│   ├── requirements.txt     # Python dependencies
+│   └── .env                 # Config (không commit)
+│
+├── frontend/
+│   ├── index.html          # Trang chat chính
+│   ├── login.html          # Trang đăng nhập
+│   ├── script.js           # JavaScript logic
+│   └── style.css           # Styling
+│
+├── images/
+│   ├── CodeMate_AI.png     # Logo/favicon
+│   ├── login-page.png      # Screenshot login
+│   └── main-interface.png  # Screenshot main
+│
+├── .gitignore
+├── .env.example
+└── README.md
 ```
+
+---
+
+## 🔐 Bảo mật
+
+- ✅ Mật khẩu được hash bằng bcrypt
+- ✅ Session-based authentication
+- ✅ CORS được cấu hình chặt chẽ
+- ✅ Google OAuth 2.0 token verification
+- ✅ SQL injection protection với parameterized queries
+
+---
+
+## 🚀 Deployment
+
+### Sử dụng Waitress (Windows) hoặc Gunicorn (Linux)
+
+```bash
+# Windows
+waitress-serve --port=5000 nlp_main:app
+
+# Linux
+gunicorn -w 4 -b 0.0.0.0:5000 nlp_main:app
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Lỗi kết nối database
+```bash
+# Kiểm tra MySQL đang chạy
+# Windows
+net start MySQL80
+
+# Linux
+sudo systemctl start mysql
+```
+
+### Lỗi Whisper model
+```bash
+# Model sẽ tự động tải lần đầu chạy
+# Nếu lỗi, xóa cache và thử lại:
+rm -rf ~/.cache/huggingface
+```
+
+---
+
+## 📝 Tính năng sắp tới
+
+- [ ] Dark/Light mode toggle
+- [ ] Export chat history
+- [ ] File upload support
+- [ ] Voice output (TTS)
+- [ ] Multi-language support
+- [ ] Code execution sandbox
+
+---
+
+## 👨‍💻 Tác giả
+
+**Đức Nguyễn**
+- GitHub: [@SilverFledgling](https://github.com/SilverFledgling)
+- Email: ducnguyenpti2310@gmail.com
+
+---
+
+## 📄 License
+
+MIT License - xem file [LICENSE](LICENSE) để biết thêm chi tiết.
+
+---
+
+## 🙏 Acknowledgments
+
+- OpenAI GPT-4 API
+- Faster-Whisper (Systran)
+- Google Identity Services
+- Font Awesome Icons
+
+---
+
+⭐ **Nếu project hữu ích, hãy cho mình một star nhé!**

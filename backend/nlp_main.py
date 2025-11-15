@@ -1,7 +1,7 @@
 import os
 import time
 import logging
-from flask import Flask, request, jsonify, send_from_directory, session
+from flask import Flask, request, jsonify, send_from_directory, session, make_response
 from flask_cors import CORS
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -16,32 +16,58 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "your-secret-key-change-this")
 
-CORS(app, supports_credentials=True, origins=["http://localhost:5000", "http://127.0.0.1:5000"])
+# Cấu hình CORS
+CORS(app, 
+    supports_credentials=True, 
+    origins=["http://localhost:5000", "http://127.0.0.1:5000"],
+    allow_headers=["Content-Type", "Authorization"],
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    expose_headers=["Content-Type"]
+)
+
 FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend')
 IMAGE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'images')
 
 # Google OAuth Config
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+if GOOGLE_CLIENT_ID:
+    logging.info(f"✓ Google Client ID loaded: {GOOGLE_CLIENT_ID[:30]}...")
+else:
+    logging.warning("⚠ Google Client ID not found in environment variables!")
+
+@app.before_request
+def handle_preflight():
+    """Xử lý CORS preflight requests"""
+    if request.method == 'OPTIONS':
+        response = make_response()
+        origin = request.headers.get('Origin')
+        if origin in ["http://localhost:5000", "http://127.0.0.1:5000"]:
+            response.headers.add("Access-Control-Allow-Origin", origin)
+        else:
+            response.headers.add("Access-Control-Allow-Origin", "http://localhost:5000")
+        response.headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        response.headers.add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+        response.headers.add("Access-Control-Allow-Credentials", "true")
+        return response
 
 # OpenAI Client
 try:
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    logging.info("Khởi tạo OpenAI client thành công.")
+    logging.info("✓ Khởi tạo OpenAI client thành công.")
 except Exception as e:
-    logging.error(f"Lỗi khi khởi tạo OpenAI client: {e}")
+    logging.error(f"✗ Lỗi khi khởi tạo OpenAI client: {e}")
     client = None
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # Whisper Model
-# Tự động tải mô hình từ Hugging Face Hub (nếu chưa có)
 MODEL_PATH = "Duke03/Whisper-medium-vi-ct2-int8" 
 logging.info(f"Bắt đầu tải mô hình Whisper từ: {MODEL_PATH}")
 try:
     whisper_model = WhisperModel(MODEL_PATH, device="cpu", compute_type="int8", local_files_only=False)
-    logging.info("Tải mô hình Whisper thành công.")
+    logging.info("✓ Tải mô hình Whisper thành công.")
 except Exception as e:
-    logging.error(f"Lỗi khi tải mô hình Whisper: {e}")
+    logging.error(f"✗ Lỗi khi tải mô hình Whisper: {e}")
     whisper_model = None
 
 SYSTEM_PROMPT = """
@@ -99,7 +125,7 @@ def register():
     
     email = data.get('email')
     password = data.get('password')
-    full_name = data.get('full_name', email.split('@')[0])
+    full_name = data.get('full_name', email.split('@')[0] if email else '')
     
     if not email or not password:
         return jsonify({"error": "Email và password là bắt buộc"}), 400
@@ -107,6 +133,7 @@ def register():
     user_id = database.create_user(email, password, full_name)
     
     if user_id:
+        logging.info(f"✓ Đăng ký thành công: {email}")
         return jsonify({"message": "Đăng ký thành công", "user_id": user_id}), 201
     else:
         return jsonify({"error": "Email đã tồn tại hoặc lỗi hệ thống"}), 400
@@ -128,6 +155,8 @@ def login():
         session['user_id'] = user['id']
         session['email'] = user['email']
         
+        logging.info(f"✓ Đăng nhập thành công: {email}")
+        
         return jsonify({
             "message": "Đăng nhập thành công",
             "user": {
@@ -138,29 +167,44 @@ def login():
             }
         }), 200
     else:
+        logging.warning(f"✗ Đăng nhập thất bại: {email}")
         return jsonify({"error": "Email hoặc mật khẩu không đúng"}), 401
 
 @app.route('/api/auth/google', methods=['POST'])
 def google_login():
-    """Đăng nhập với Google OAuth"""
-    data = request.get_json()
-    token = data.get('credential')
-    
-    if not token:
-        return jsonify({"error": "Token không hợp lệ"}), 400
-    
+    """Đăng nhập với Google OAuth (Google Identity Services)"""
     try:
-        # Xác thực token từ Google
+        data = request.get_json()
+        token = data.get('credential')
+        
+        if not token:
+            logging.error("✗ Không nhận được credential từ Google")
+            return jsonify({"error": "Token không hợp lệ"}), 400
+        
+        if not GOOGLE_CLIENT_ID:
+            logging.error("✗ GOOGLE_CLIENT_ID không được cấu hình")
+            return jsonify({"error": "Server chưa cấu hình Google OAuth"}), 500
+        
+        # Xác thực token từ Google Identity Services
+        logging.info("Đang xác thực Google token...")
         idinfo = id_token.verify_oauth2_token(
             token, 
             google_requests.Request(), 
-            GOOGLE_CLIENT_ID
+            GOOGLE_CLIENT_ID,
+            clock_skew_in_seconds=10
         )
+        
+        # Kiểm tra issuer
+        if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+            logging.error(f"✗ Invalid issuer: {idinfo['iss']}")
+            return jsonify({"error": "Token không hợp lệ"}), 401
         
         google_id = idinfo['sub']
         email = idinfo['email']
         full_name = idinfo.get('name', email.split('@')[0])
         avatar_url = idinfo.get('picture')
+        
+        logging.info(f"✓ Xác thực Google thành công cho email: {email}")
         
         # Tạo hoặc lấy user
         user = database.get_or_create_google_user(google_id, email, full_name, avatar_url)
@@ -168,6 +212,8 @@ def google_login():
         if user:
             session['user_id'] = user['id']
             session['email'] = user['email']
+            
+            logging.info(f"✓ Đăng nhập Google thành công: {email}")
             
             return jsonify({
                 "message": "Đăng nhập Google thành công",
@@ -179,16 +225,23 @@ def google_login():
                 }
             }), 200
         else:
+            logging.error("✗ Không thể tạo hoặc lấy user từ database")
             return jsonify({"error": "Lỗi khi xử lý đăng nhập Google"}), 500
             
     except ValueError as e:
-        logging.error(f"Lỗi xác thực Google token: {e}")
-        return jsonify({"error": "Token không hợp lệ"}), 401
+        logging.error(f"✗ Lỗi xác thực Google token: {e}")
+        return jsonify({"error": "Token không hợp lệ hoặc đã hết hạn"}), 401
+    
+    except Exception as e:
+        logging.error(f"✗ Lỗi không mong muốn khi xử lý Google login: {e}")
+        return jsonify({"error": "Lỗi server"}), 500
 
 @app.route('/api/auth/logout', methods=['POST'])
 def logout():
     """Đăng xuất"""
+    email = session.get('email', 'unknown')
     session.clear()
+    logging.info(f"✓ Đăng xuất thành công: {email}")
     return jsonify({"message": "Đăng xuất thành công"}), 200
 
 @app.route('/api/auth/me', methods=['GET'])
@@ -354,4 +407,11 @@ def handle_chat():
 
 if __name__ == '__main__':
     from waitress import serve
+    print("\n" + "="*60)
+    print("🚀 Starting CodeMate AI Server...")
+    print("="*60)
+    print(f"📍 Server URL: http://localhost:5000")
+    print(f"🔐 CORS enabled for: http://localhost:5000, http://127.0.0.1:5000")
+    print(f"🔑 Google OAuth: {'ENABLED' if GOOGLE_CLIENT_ID else 'DISABLED (check .env)'}")
+    print("="*60 + "\n")
     serve(app, host="0.0.0.0", port=5000)
